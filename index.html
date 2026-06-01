@@ -4,111 +4,144 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>極簡經典紅藍書單系統</title>
-  </head>
+  <!-- 這裡未來會放 CSS 裝潢 -->
+</head>
 <body>
 
-  <nav class="navbar">
-    <button class="nav-btn active" data-target="tab-tags">標籤挑選</button>
-    <button class="nav-btn" data-target="tab-search">搜尋書目</button>
-    <button class="nav-btn" data-target="tab-admin">編輯資料庫</button>
-  </nav>
+  <!-- 全域核心容器：負責把所有內容鎖在畫面中央 -->
+  <div class="global-wrapper">
 
-  <main class="content-container">
+    <!-- 5. 預留的神秘大標題（大約 70 像素，置中） -->
+    <header class="main-header">
+      <h1>這裡之後放你的大標題</h1>
+    </header>
 
-    <section id="tab-tags" class="tab-panel active">
-      <div class="tags-grid">
+    <!-- 頂部導覽列：負責切換分頁（4. 預設會在標籤挑選） -->
+    <nav class="navbar">
+      <button class="nav-btn active" data-target="tab-tags">標籤挑選</button>
+      <button class="nav-btn" data-target="tab-search">搜尋書目</button>
+      <button class="nav-btn" data-target="tab-admin">編輯資料庫</button>
+    </nav>
+
+    <!-- 中央主要內容顯示區 -->
+    <main class="content-container">
+
+      <!-- 分頁一：標籤挑選頁（預設顯示） -->
+      <section id="tab-tags" class="tab-panel active">
+        <!-- 雜誌方格區群 -->
+        <div class="tags-grid">
+          
+          <!-- 大分類方格 1 -->
+          <div class="category-box">
+            <div class="category-header">
+              <h2>世界觀</h2>
+              <div class="needle-line"></div> <!-- 1. 極細紅色針筒線 -->
+            </div>
+            <div class="tags-list">
+              <button class="tag-item">無限流</button>
+              <button class="tag-item">校園文</button>
+              <button class="tag-item">修仙</button>
+            </div>
+          </div>
+
+          <!-- 大分類方格 2 -->
+          <div class="category-box">
+            <div class="category-header">
+              <h2>甜度冰塊</h2>
+              <div class="needle-line"></div>
+            </div>
+            <div class="tags-list">
+              <button class="tag-item">全糖無刀</button>
+              <button class="tag-item">有刀</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 底部：懸空錯位大按鈕 -->
+        <div class="btn-offset-wrapper">
+          <button class="btn-generate">生成書單</button>
+        </div>
+      </section>
+
+
+      <!-- 分頁二：搜尋書目頁（預設隱藏，置中排版） -->
+      <section id="tab-search" class="tab-panel">
+        <!-- Google 式極簡搜尋框 -->
+        <div class="search-wrapper">
+          <input type="text" class="search-input" placeholder="輸入關鍵字搜尋書名或作者...">
+        </div>
+
+        <!-- 書單結果清單（大行距無邊框表格） -->
+        <div class="book-list-container">
+          <table class="book-table">
+            <thead>
+              <tr>
+                <th>書名</th>
+                <th>作者</th>
+                <th>標籤</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="book-title">全球高考</td>
+                <td class="book-author">木蘇里</td>
+                <td><span class="tag-badge"世界觀</span><span class="tag-badge">無限流</span></td>
+              </tr>
+              <tr>
+                <td class="book-title">天官賜福</td>
+                <td class="book-author">墨香銅臭</td>
+                <td><span class="tag-badge">甜度冰塊</span><span class="tag-badge">有刀</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+
+      <!-- 分頁三：編輯資料庫頁（預設隱藏） -->
+      <section id="tab-admin" class="tab-panel">
         
-        <div class="category-box">
-          <div class="category-header">
-            <h2>理工科</h2>
-            <div class="needle-line"></div> </div>
-          <div class="tags-list">
-            <button class="tag-item">微積分</button>
-            <button class="tag-item">線性代數</button>
-            <button class="tag-item">物理</button>
-          </div>
+        <!-- 1. 密鑰輸入區：點擊「編輯資料庫」後最先看到的畫面（置中） -->
+        <div class="admin-auth-zone">
+          <input type="password" class="auth-input" placeholder="請輸入管理員密鑰解鎖...">
+          <button class="auth-btn">解鎖後台</button>
         </div>
 
-        <div class="category-box">
-          <div class="category-header">
-            <h2>文學類</h2>
-            <div class="needle-line"></div>
+        <!-- 1 & 3. 管理員控制面板：輸入正確密鑰後「才會顯示」的隱藏內容 -->
+        <div class="admin-panel-dashboard" style="display: none;">
+          
+          <!-- 功能 A：新增大分類與小標籤（管理員專屬） -->
+          <div class="admin-section">
+            <h3>新增大分類 / 小標籤</h3>
+            <div class="input-group">
+              <input type="text" placeholder="大分類名稱（如：商管財經）">
+              <input type="text" placeholder="或小標籤名稱（如：總體經濟）">
+            </div>
+            <button class="admin-action-btn">確認新增資料</button>
           </div>
-          <div class="tags-list">
-            <button class="tag-item">科幻小說</button>
-            <button class="tag-item">現代詩集</button>
+
+          <!-- 功能 B：標籤管理（管理員專屬的合併與刪除） -->
+          <div class="admin-section">
+            <h3>標籤管理（合併與刪除）</h3>
+            <p class="admin-tip">請勾選要操作的標籤：</p>
+            <div class="admin-checkbox-list">
+              <label><input type="checkbox"> 微積分</label>
+              <label><input type="checkbox"> 高等數學</label>
+              <label><input type="checkbox"> 科幻小說</label>
+            </div>
+            <div class="admin-actions-group">
+              <button class="danger-btn">合併選取標籤</button>
+              <button class="danger-btn">刪除選取標籤</button>
+            </div>
           </div>
+
         </div>
+      </section>
 
-      </div>
+    </main>
+  </div>
 
-      <div class="btn-offset-wrapper">
-        <button class="btn-generate">生成書單</button>
-      </div>
-    </section>
-
-
-    <section id="tab-search" class="tab-panel">
-      <div class="search-wrapper">
-        <input type="text" class="search-input" placeholder="輸入關鍵字搜尋書名或作者...">
-      </div>
-
-      <div class="book-list-container">
-        <table class="book-table">
-          <thead>
-            <tr>
-              <th>書名</th>
-              <th>作者</th>
-              <th>標籤</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="book-title">微積分之美</td>
-              <td class="book-author">張教授</td>
-              <td><span class="tag-badge">理工科</span><span class="tag-badge">微積分</span></td>
-            </tr>
-            <tr>
-              <td class="book-title">沙丘</td>
-              <td class="book-author">法蘭克·赫伯特</td>
-              <td><td><span class="tag-badge">文學類</span><span class="tag-badge">科幻小說</span></td></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-
-    <section id="tab-admin" class="tab-panel">
-      <div class="admin-auth">
-        <input type="password" class="auth-input" placeholder="請輸入管理員暗號...">
-        <button class="auth-btn">解鎖後台</button>
-      </div>
-
-      <div class="admin-panel">
-        
-        <div class="admin-section">
-          <h3>新增大分類/小標籤</h3>
-          <input type="text" placeholder="大分類名稱（如：商管財經）">
-          <input type="text" placeholder="或小標籤名稱（如：總體經濟）">
-          <button>確認新增</button>
-        </div>
-
-        <div class="admin-section">
-          <h3>標籤管理（合併/刪除）</h3>
-          <p>請勾選要操作的標籤：</p>
-          <label><input type="checkbox"> 微積分</label>
-          <label><input type="checkbox"> 高等數學</label>
-          <div class="admin-actions">
-            <button class="danger-btn">合併選取標籤</button>
-            <button class="danger-btn">刪除選取標籤</button>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-  </main>
-
-  </body>
+  <!-- 這裡未來會放 JavaScript 水電工 -->
+</body>
 </html>
