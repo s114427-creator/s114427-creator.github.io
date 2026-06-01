@@ -4,13 +4,340 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>極簡經典紅藍書單系統</title>
-  </head>
+  
+  <style>
+    /* 全域基底設定：營造乾淨大呼吸感的空間 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: #fcfcfc; /* 極淺溫和冷灰底 */
+      color: #2b2b2b; /* 深碳灰字體，比純黑溫柔 */
+      padding: 40px 20px;
+    }
+
+    /* 全域置中大容器 */
+    .global-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    /* 5. 70像素的神秘大標題 */
+    .main-header h1 {
+      font-size: 70px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 40px;
+      color: #2b2b2b;
+    }
+
+    /* 頂部導覽列：克萊茵藍與細紅線分流 */
+    .navbar {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 50px;
+    }
+
+    .nav-btn {
+      background: none;
+      border: 1px solid #002fa7; /* 克萊茵藍細外框 */
+      color: #002fa7;
+      padding: 10px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    /* 點選到分頁時的啟用狀態：亮起紅色 */
+    .nav-btn.active {
+      background-color: #e50012; /* 正紅 */
+      border-color: #e50012;
+      color: #ffffff;
+    }
+
+    /* 中央主要內容顯示區 */
+    .content-container {
+      width: 100%;
+    }
+
+    /* 分頁顯示/隱藏的魔法 */
+    .tab-panel {
+      display: none; /* 預設通通藏起來 */
+    }
+
+    .tab-panel.active {
+      display: block; /* 只有加了 active 的分頁才看得到 */
+    }
+
+    /* ==========================================
+       分頁一：雜誌方格標籤頁 樣式
+       ========================================== */
+    .tags-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .category-box {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 30px;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+
+    .category-header {
+      margin-bottom: 24px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .category-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #2b2b2b;
+      margin-bottom: 4px;
+    }
+
+    /* 1. 極細紅色針筒線 */
+    .needle-line {
+      width: 100%;
+      height: 1.5px; /* 極細 */
+      background-color: #e50012; /* 正紅 */
+      border-radius: 10px;
+    }
+
+    .tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* 克萊茵藍膠囊小標籤 */
+    .tag-item {
+      background: #ffffff;
+      border: 1px solid #002fa7; /* 克萊茵藍細框 */
+      color: #002fa7;
+      padding: 6px 14px;
+      font-size: 14px;
+      border-radius: 20px; /* 膠囊狀 */
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tag-item:hover {
+      transform: scale(1.05); /* 微微放大彈性感 */
+    }
+
+    /* 標籤被選中時的狀態 */
+    .tag-item.selected {
+      background-color: #002fa7; /* 填滿克萊茵藍 */
+      color: #ffffff;
+    }
+
+    /* 2. 核心按鈕：3px 懸空錯位大按鈕 */
+    .btn-offset-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .btn-generate {
+      position: relative;
+      background-color: #002fa7; /* 藍色底塊 */
+      color: #e50012; /* 紅色文字 */
+      border: 1px solid #e50012; /* 紅色線框 */
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 4px;
+      /* 關鍵：利用 box-shadow 做出位移 3px 的紅色線稿立體感 */
+      box-shadow: 3px 3px 0px #e50012; 
+      transition: all 0.1s ease;
+    }
+
+    /* 按鈕按下去的物理物理回饋：線框與色塊合一 */
+    .btn-generate:active {
+      transform: translate(3px, 3px);
+      box-shadow: 0px 0px 0px #e50012;
+    }
+
+    /* ==========================================
+       分頁二：搜尋頁與高階清單 樣式
+       ========================================== */
+    .search-wrapper {
+      margin-bottom: 40px;
+    }
+
+    /* Google 式極簡搜尋框 */
+    .search-input {
+      width: 100%;
+      max-width: 500px;
+      padding: 14px 20px;
+      font-size: 16px;
+      border: 1px solid #002fa7; /* 克萊茵藍細框 */
+      border-radius: 30px;
+      outline: none;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    /* 高級感無橫線、大行距書單列表 */
+    .book-list-container {
+      width: 100%;
+      margin-top: 20px;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .book-table {
+      width: 100%;
+      border-collapse: collapse; /* 拿掉預設死板橫線 */
+      text-align: left;
+    }
+
+    .book-table th {
+      padding: 16px 24px;
+      font-size: 14px;
+      color: #888888;
+      font-weight: 500;
+      border-bottom: 1px solid #f0f0f0; /* 只有表頭給一條極淡的線 */
+    }
+
+    /* 大行距無分隔線的書目行 */
+    .book-table tbody tr {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .book-table td {
+      padding: 28px 24px; /* 超大行距，讓畫面呼吸 */
+      font-size: 16px;
+    }
+
+    .book-title {
+      font-weight: 700;
+      color: #2b2b2b;
+    }
+
+    .book-author {
+      color: #666666;
+    }
+
+    /* 懸浮效果：滑過時亮起極淡藍色陰影襯托 */
+    .book-table tbody tr:hover {
+      background-color: rgba(0, 47, 167, 0.02);
+      box-shadow: inset 4px 0px 0px #002fa7; /* 左側亮起一條克萊茵藍提示線 */
+    }
+
+    /* 書單裡的標籤小膠囊 */
+    .tag-badge {
+      display: inline-block;
+      background: rgba(0, 47, 167, 0.05);
+      color: #002fa7;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 12px;
+      margin-right: 6px;
+    }
+
+    /* ==========================================
+       分頁三：後台管理頁 樣式
+       ========================================== */
+    .admin-auth-zone {
+      max-width: 400px;
+      margin: 60px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .auth-input {
+      padding: 12px;
+      border: 1px solid #e50012; /* 後台用正紅代表警示 */
+      border-radius: 4px;
+      outline: none;
+      text-align: center;
+    }
+
+    .auth-btn, .admin-action-btn {
+      background-color: #2b2b2b;
+      color: white;
+      border: none;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .admin-panel-dashboard {
+      text-align: left;
+      background: white;
+      border: 1px solid #e0e0e0;
+      padding: 40px;
+      border-radius: 8px;
+    }
+
+    .admin-section {
+      margin-bottom: 40px;
+    }
+
+    .admin-section h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #e50012; /* 紅色細標題 */
+      border-left: 3px solid #e50012;
+      padding-left: 10px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .admin-checkbox-list label {
+      display: block;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .admin-actions-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .danger-btn {
+      background: none;
+      border: 1px solid #e50012;
+      color: #e50012;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  </style>
+</head>
 <body>
 
   <div class="global-wrapper">
 
     <header class="main-header">
-      <h1>這裡之後放你的大標題</h1>
+      <h1>原創小說私房書單</h1>
     </header>
 
     <nav class="navbar">
@@ -38,8 +365,7 @@
           <div class="category-box">
             <div class="category-header">
               <h2>甜度冰塊</h2>
-              <div class="needle-line"></div>
-            </div>
+              <div class="needle-line"></div> </div>
             <div class="tags-list">
               <button class="tag-item">全糖無刀</button>
               <button class="tag-item">有刀</button>
@@ -97,8 +423,8 @@
           <div class="admin-section">
             <h3>新增大分類 / 小標籤</h3>
             <div class="input-group">
-              <input type="text" placeholder="大分類名稱（如：商管財經）">
-              <input type="text" placeholder="或小標籤名稱（如：總體經濟）">
+              <input type="text" placeholder="大分類名稱（如：劇情流）">
+              <input type="text" placeholder="或小標籤名稱（如：強強）">
             </div>
             <button class="admin-action-btn">確認新增資料</button>
           </div>
@@ -123,5 +449,49 @@
     </main>
   </div>
 
-  </body>
+  <script>
+    // 【功能一：分頁切換開關】
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    navButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // 1. 移除所有人按鈕的紅色高亮，幫被點擊的按鈕加上高亮
+        navButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        // 2. 隱藏所有分頁，只顯示對應的目標分頁
+        const targetTabId = button.getAttribute('data-target');
+        tabPanels.forEach(panel => panel.classList.remove('active'));
+        document.getElementById(targetTabId).classList.add('active');
+      });
+    });
+
+    // 【功能二：小標籤點擊填滿克萊茵藍】
+    const tagItems = document.querySelectorAll('.tag-item');
+    tagItems.forEach(tag => {
+      tag.addEventListener('click', () => {
+        tag.classList.toggle('selected'); // 點一下變藍色，再點一下還原
+      });
+    });
+
+    // 【功能三：管理員密鑰解鎖邏輯】
+    const authBtn = document.querySelector('.auth-btn');
+    const authInput = document.querySelector('.auth-input');
+    const authZone = document.querySelector('.admin-auth-zone');
+    const adminDashboard = document.querySelector('.admin-panel-dashboard');
+
+    authBtn.addEventListener('click', () => {
+      // 這裡設定你的暗號，目前暫定是 admin123
+      if (authInput.value === 'admin123') {
+        alert('解鎖成功！歡迎管理員。');
+        authZone.style.display = 'none'; // 藏起輸入框
+        adminDashboard.style.display = 'block'; // 亮出管理面板
+      } else {
+        alert('密鑰錯誤！別想偷偷進來唷 🤪');
+        authInput.value = '';
+      }
+    });
+  </script>
+</body>
 </html>
