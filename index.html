@@ -1,11 +1,114 @@
-<DOCTYPE>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>HAHA</title>
-    <link rel="icon" href="images.png">
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>極簡經典紅藍書單系統</title>
   </head>
-  <body>
-    hello world
+<body>
+
+  <nav class="navbar">
+    <button class="nav-btn active" data-target="tab-tags">標籤挑選</button>
+    <button class="nav-btn" data-target="tab-search">搜尋書目</button>
+    <button class="nav-btn" data-target="tab-admin">編輯資料庫</button>
+  </nav>
+
+  <main class="content-container">
+
+    <section id="tab-tags" class="tab-panel active">
+      <div class="tags-grid">
+        
+        <div class="category-box">
+          <div class="category-header">
+            <h2>理工科</h2>
+            <div class="needle-line"></div> </div>
+          <div class="tags-list">
+            <button class="tag-item">微積分</button>
+            <button class="tag-item">線性代數</button>
+            <button class="tag-item">物理</button>
+          </div>
+        </div>
+
+        <div class="category-box">
+          <div class="category-header">
+            <h2>文學類</h2>
+            <div class="needle-line"></div>
+          </div>
+          <div class="tags-list">
+            <button class="tag-item">科幻小說</button>
+            <button class="tag-item">現代詩集</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="btn-offset-wrapper">
+        <button class="btn-generate">生成書單</button>
+      </div>
+    </section>
+
+
+    <section id="tab-search" class="tab-panel">
+      <div class="search-wrapper">
+        <input type="text" class="search-input" placeholder="輸入關鍵字搜尋書名或作者...">
+      </div>
+
+      <div class="book-list-container">
+        <table class="book-table">
+          <thead>
+            <tr>
+              <th>書名</th>
+              <th>作者</th>
+              <th>標籤</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="book-title">微積分之美</td>
+              <td class="book-author">張教授</td>
+              <td><span class="tag-badge">理工科</span><span class="tag-badge">微積分</span></td>
+            </tr>
+            <tr>
+              <td class="book-title">沙丘</td>
+              <td class="book-author">法蘭克·赫伯特</td>
+              <td><td><span class="tag-badge">文學類</span><span class="tag-badge">科幻小說</span></td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section id="tab-admin" class="tab-panel">
+      <div class="admin-auth">
+        <input type="password" class="auth-input" placeholder="請輸入管理員暗號...">
+        <button class="auth-btn">解鎖後台</button>
+      </div>
+
+      <div class="admin-panel">
+        
+        <div class="admin-section">
+          <h3>新增大分類/小標籤</h3>
+          <input type="text" placeholder="大分類名稱（如：商管財經）">
+          <input type="text" placeholder="或小標籤名稱（如：總體經濟）">
+          <button>確認新增</button>
+        </div>
+
+        <div class="admin-section">
+          <h3>標籤管理（合併/刪除）</h3>
+          <p>請勾選要操作的標籤：</p>
+          <label><input type="checkbox"> 微積分</label>
+          <label><input type="checkbox"> 高等數學</label>
+          <div class="admin-actions">
+            <button class="danger-btn">合併選取標籤</button>
+            <button class="danger-btn">刪除選取標籤</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
   </body>
 </html>
