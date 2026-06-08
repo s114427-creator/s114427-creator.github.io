@@ -7,7 +7,7 @@
   
   <style>
     /* ==========================================
-       🎨 全域基底與色彩計畫（藍色上1/3區塊）
+       🎨 全域基底與色彩計畫
        ========================================== */
     * {
       box-sizing: border-box;
@@ -24,24 +24,22 @@
       flex-direction: column;
     }
 
-    /* 2. 網頁上 1/3 塊用深克萊茵藍填滿（90%透明度） */
+    /* 6. 網頁上 1/3 塊用色碼 #000079 且透明度 90% */
     .top-blue-zone {
-      background-color: rgba(0, 0, 147, 0.8); /* #000093 的 RGBA 90% 透明度寫法 */
+      background-color: rgba(0, 0, 121, 0.9); /* #000079 的 RGBA 90% 寫法 */
       padding: 60px 20px 40px 20px;
       text-align: center;
       color: #ffffff;
     }
 
-    /* 5. 70像素的神秘大標題 */
     .main-header h1 {
       font-size: 70px;
       font-weight: 900;
       letter-spacing: -1px;
       margin-bottom: 30px;
-      color: #ffffff; /* 藍底配白字 */
+      color: #ffffff;
     }
 
-    /* 頂部導覽列 */
     .navbar {
       display: flex;
       justify-content: center;
@@ -50,7 +48,7 @@
 
     .nav-btn {
       background: none;
-      border: 1px solid #ffffff; /* 藍底配白框 */
+      border: 1px solid #ffffff;
       color: #ffffff;
       padding: 10px 24px;
       font-size: 16px;
@@ -60,14 +58,12 @@
       transition: all 0.2s ease;
     }
 
-    /* 點選到分頁時的啟用狀態：亮起紅色 */
     .nav-btn.active {
-      background-color: #e50012; /* 正紅 */
+      background-color: #e50012;
       border-color: #e50012;
       color: #ffffff;
     }
 
-    /* 下方 2/3 內容白底區 */
     .main-content-zone {
       flex: 1;
       padding: 50px 20px;
@@ -87,7 +83,7 @@
     }
 
     /* ==========================================
-       分頁一：雜誌方格標籤頁
+       分頁一：雜誌方格標籤頁 樣式
        ========================================== */
     .tags-grid {
       display: grid;
@@ -118,7 +114,6 @@
       margin-bottom: 6px;
     }
 
-    /* 1. 極細紅色針筒線 */
     .needle-line {
       width: 100%;
       height: 1.5px;
@@ -134,8 +129,8 @@
 
     .tag-item {
       background: #ffffff;
-      border: 1px solid #002fa7;
-      color: #002fa7;
+      border: 1px solid #000079;
+      color: #000079;
       padding: 6px 14px;
       font-size: 14px;
       border-radius: 20px;
@@ -148,11 +143,10 @@
     }
 
     .tag-item.selected {
-      background-color: #002fa7;
+      background-color: #000079;
       color: #ffffff;
     }
 
-    /* 2. 懸空錯位大按鈕（1. 文字改成白色） */
     .btn-offset-wrapper {
       display: flex;
       justify-content: center;
@@ -161,8 +155,8 @@
 
     .btn-generate {
       position: relative;
-      background-color: #002fa7;
-      color: #ffffff; /* 1. 文字修正為白色 */
+      background-color: #000079;
+      color: #ffffff;
       border: 1px solid #e50012;
       padding: 14px 40px;
       font-size: 18px;
@@ -179,9 +173,8 @@
     }
 
     /* ==========================================
-       分頁二：搜尋頁與高階清單
+       分頁二：搜尋頁與高階書單清單 樣式
        ========================================== */
-    /* 1. 搜尋框容器與隱藏的紅色針筒線 */
     .search-container-box {
       max-width: 500px;
       margin: 0 auto 40px auto;
@@ -193,7 +186,7 @@
       width: 100%;
       padding: 14px 20px;
       font-size: 16px;
-      border: 1px solid #002fa7; /* 克萊茵藍線框 */
+      border: 1px solid #000079;
       border-radius: 30px;
       outline: none;
       text-align: center;
@@ -201,22 +194,17 @@
       background-color: #ffffff;
     }
 
-    /* 1. 搜尋點擊時動態浮現的隱約紅色針筒線 */
     .search-needle-line {
       width: 60%;
       height: 1.5px;
       background-color: #e50012;
       margin: 8px auto 0 auto;
-      opacity: 0; /* 預設隱形 */
+      opacity: 0;
       transition: opacity 0.3s ease;
     }
 
-    /* 當輸入框被點擊時，外框變粗、紅色針筒線顯現 */
-    .search-input:focus {
-      box-shadow: 0 0 8px rgba(0, 47, 167, 0.2);
-    }
     .search-input:focus + .search-needle-line {
-      opacity: 0.7; /* 1. 隱約出現 */
+      opacity: 0.7;
     }
 
     .book-list-container {
@@ -240,13 +228,8 @@
       border-bottom: 1px solid #f0f0f0;
     }
 
-    .book-table tbody tr {
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
     .book-table td {
-      padding: 28px 24px; /* 大行距 */
+      padding: 28px 24px;
     }
 
     .book-title {
@@ -255,14 +238,14 @@
     }
 
     .book-table tbody tr:hover {
-      background-color: rgba(0, 47, 167, 0.02);
-      box-shadow: inset 4px 0px 0px #002fa7;
+      background-color: rgba(0, 0, 121, 0.02);
+      box-shadow: inset 4px 0px 0px #000079;
     }
 
     .tag-badge {
       display: inline-block;
-      background: rgba(0, 47, 167, 0.05);
-      color: #002fa7;
+      background: rgba(0, 0, 121, 0.05);
+      color: #000079;
       padding: 4px 10px;
       font-size: 12px;
       border-radius: 12px;
@@ -270,7 +253,7 @@
     }
 
     /* ==========================================
-       分頁三：編輯資料庫與管理員面板
+       分頁三：編輯資料庫與管理員面板 樣式
        ========================================== */
     .admin-auth-zone {
       max-width: 400px;
@@ -283,14 +266,14 @@
 
     .auth-input {
       padding: 12px;
-      border: 1px solid #002fa7;
+      border: 1px solid #000079;
       border-radius: 4px;
       outline: none;
       text-align: center;
     }
 
     .auth-btn, .admin-action-btn {
-      background-color: #002fa7;
+      background-color: #000079;
       color: white;
       border: none;
       padding: 12px;
@@ -299,7 +282,6 @@
       font-weight: 600;
     }
 
-    /* 7. 使用者新增書庫快捷文字 */
     .user-shortcut-text {
       margin-top: 10px;
       font-size: 14px;
@@ -314,7 +296,6 @@
     }
 
     .admin-panel-dashboard {
-      position: relative; /* 為了讓退出按鈕靠右下角定位 */
       text-align: left;
       background: white;
       border: 1px solid #e0e0e0;
@@ -361,10 +342,20 @@
       margin-bottom: 10px;
     }
 
+    /* 3. 完美修復：文字與勾選框水平垂直對齊 */
     .admin-checkbox-list label {
-      display: block;
-      margin-bottom: 8px;
+      display: flex;
+      align-items: center; /* 垂直居中對齊 */
+      gap: 8px; /* 框與文字之間的精緻間距 */
+      margin-bottom: 10px;
       font-size: 14px;
+      cursor: pointer;
+    }
+
+    .admin-checkbox-list label input[type="checkbox"] {
+      margin: 0; /* 消除瀏覽器預設位移 */
+      width: 16px;
+      height: 16px;
       cursor: pointer;
     }
 
@@ -390,7 +381,6 @@
       color: white;
     }
 
-    /* 6. 右下方簡約退出按鈕 */
     .logout-btn-container {
       text-align: right;
       margin-top: 20px;
@@ -410,7 +400,6 @@
       color: #fff;
     }
 
-    /* 8. 最新五筆書籍動態看板 */
     .recent-books-dashboard {
       margin-top: 30px;
       border-top: 1px dashed #e0e0e0;
@@ -436,7 +425,7 @@
       justify-content: space-between;
     }
     .recent-item .b-tags {
-      color: #002fa7;
+      color: #000079;
       font-size: 12px;
     }
   </style>
@@ -449,8 +438,8 @@
     </header>
 
     <nav class="navbar">
-      <button class="nav-btn active" data-target="tab-tags">標籤挑選</button>
-      <button class="nav-btn" data-target="tab-search">搜尋書目</button>
+      <button class="nav-btn active" data-target="tab-tags" id="nav-btn-tags">標籤挑選</button>
+      <button class="nav-btn" data-target="tab-search" id="nav-btn-search">搜尋書目</button>
       <button class="nav-btn" data-target="tab-admin">編輯資料庫</button>
     </nav>
   </div>
@@ -460,39 +449,16 @@
       <main class="content-container">
 
         <section id="tab-tags" class="tab-panel active">
-          <div class="tags-grid">
-            <div class="category-box">
-              <div class="category-header">
-                <h2>世界觀</h2>
-                <div class="needle-line"></div>
-              </div>
-              <div class="tags-list">
-                <button class="tag-item">無限流</button>
-                <button class="tag-item">校園文</button>
-                <button class="tag-item">修仙</button>
-              </div>
-            </div>
-
-            <div class="category-box">
-              <div class="category-header">
-                <h2>甜度冰塊</h2>
-                <div class="needle-line"></div>
-              </div>
-              <div class="tags-list">
-                <button class="tag-item">全糖無刀</button>
-                <button class="tag-item">有刀</button>
-              </div>
-            </div>
-          </div>
+          <div class="tags-grid" id="public-tags-grid-root"></div>
 
           <div class="btn-offset-wrapper">
-            <button class="btn-generate">生成書單</button>
+            <button class="btn-generate" id="btn-trigger-generate">生成書單</button>
           </div>
         </section>
 
         <section id="tab-search" class="tab-panel">
           <div class="search-container-box">
-            <input type="text" class="search-input" placeholder="輸入關鍵字搜尋書名或作者...">
+            <input type="text" class="search-input" id="main-search-input-field" placeholder="輸入關鍵字搜尋書名或作者...">
             <div class="search-needle-line"></div>
           </div>
 
@@ -505,24 +471,12 @@
                   <th>標籤</th>
                 </tr>
               </thead>
-              <tbody id="public-book-table-body">
-                <tr>
-                  <td class="book-title">全球高考</td>
-                  <td class="book-author">木蘇里</td>
-                  <td><span class="tag-badge">無限流</span></td>
-                </tr>
-                <tr>
-                  <td class="book-title">天官賜福</td>
-                  <td class="book-author">墨香銅臭</td>
-                  <td><span class="tag-badge">有刀</span></td>
-                </tr>
-              </tbody>
+              <tbody id="public-book-table-body"></tbody>
             </table>
           </div>
         </section>
 
         <section id="tab-admin" class="tab-panel">
-          
           <div class="admin-auth-zone">
             <input type="password" class="auth-input" placeholder="請輸入管理員密鑰解鎖...">
             <button class="auth-btn">解鎖後台</button>
@@ -534,13 +488,13 @@
           </div>
 
           <div class="admin-panel-dashboard" style="display: none;">
-            
             <div class="admin-grid-layout">
+              
               <div class="admin-section" id="admin-sec-category">
-                <h3>新增大分類 / 小標籤</h3>
+                <h3>新增大分類 / 小標籤配置</h3>
                 <div class="input-group">
-                  <input type="text" id="new-cat-input" placeholder="全新大分類名稱（如：劇情流）">
-                  <input type="text" id="new-tag-input" placeholder="或全新小標籤名稱（如：強強）">
+                  <input type="text" id="new-cat-input" placeholder="必填：大分類名稱（如：世界觀）">
+                  <input type="text" id="new-tag-input" placeholder="必填：對應的小標籤（如：強強）">
                 </div>
                 <button class="admin-action-btn" id="btn-add-tag-data" style="width:100%;">確認新增標籤配置</button>
               </div>
@@ -550,9 +504,8 @@
                 <div class="input-group">
                   <input type="text" id="new-book-title" placeholder="輸入書籍名稱">
                   <input type="text" id="new-book-author" placeholder="輸入作者名稱">
-                  <p style="font-size:13px; color:#666; margin-bottom:5px;">勾選這本書的標籤（3.可多選）：</p>
-                  <div class="admin-checkbox-list" id="pop-book-tags-list">
-                    </div>
+                  <p style="font-size:13px; color:#666; margin-bottom:5px;">勾選這本書的標籤（可多選）：</p>
+                  <div class="admin-checkbox-list" id="pop-book-tags-list"></div>
                 </div>
                 <button class="admin-action-btn" id="btn-add-book-data" style="width:100%; background-color:#e50012;">確認新增書籍</button>
               </div>
@@ -560,8 +513,7 @@
               <div class="admin-section" id="admin-sec-tag-manage">
                 <h3>標籤管理（合併與刪除）</h3>
                 <p class="admin-tip">請勾選要操作的標籤：</p>
-                <div class="admin-checkbox-list" id="pop-manage-tags-list">
-                  </div>
+                <div class="admin-checkbox-list" id="pop-manage-tags-list"></div>
                 <div class="admin-actions-group">
                   <button class="danger-btn" id="btn-merge-tags">合併選取標籤</button>
                   <button class="danger-btn" id="btn-delete-tags">刪除選取標籤</button>
@@ -571,8 +523,7 @@
               <div class="admin-section" id="admin-sec-book-manage">
                 <h3>書籍管理（合併與刪除）</h3>
                 <p class="admin-tip">請勾選要操作的書籍：</p>
-                <div class="admin-checkbox-list" id="pop-manage-books-list">
-                  </div>
+                <div class="admin-checkbox-list" id="pop-manage-books-list"></div>
                 <div class="admin-actions-group">
                   <button class="danger-btn" id="btn-merge-books">合併選取書籍</button>
                   <button class="danger-btn" id="btn-delete-books">刪除選取書籍</button>
@@ -582,14 +533,12 @@
 
             <div class="recent-books-dashboard">
               <h4>📋 最新動態：書庫現存書籍快報（最多顯示5筆）</h4>
-              <ul class="recent-list" id="recent-books-list-ui">
-                </ul>
+              <ul class="recent-list" id="recent-books-list-ui"></ul>
             </div>
 
             <div class="logout-btn-container">
               <button class="btn-logout" id="btn-admin-logout">退出關閉後台</button>
             </div>
-
           </div>
         </section>
 
@@ -599,300 +548,103 @@
 
   <script>
     // ==========================================
-    // 💾 記憶體核心資料庫（模擬真實資料運作）
+    // 💾 永續型記憶核心（持久化存儲讀取）
     // ==========================================
-    let booksDataset = [
+    const defaultTags = {
+      "世界觀": ["無限流", "校園文", "修仙"],
+      "甜度冰塊": ["全糖無刀", "有刀"]
+    };
+    const defaultBooks = [
       { id: 1, title: "全球高考", author: "木蘇里", tags: ["無限流"] },
       { id: 2, title: "天官賜福", author: "墨香銅臭", tags: ["有刀"] }
     ];
 
-    let tagsDataset = ["無限流", "校園文", "修仙", "全糖無刀", "有刀"];
-    let currentRole = "reader"; // 用來標記目前是管理員還是普通使用者
+    // 從 localStorage 讀取先前儲存的資料，若沒有則載入預設
+    let MasterDatabase = JSON.parse(localStorage.getItem('BR_MASTER_DATABASE')) || {
+      tagsConfig: defaultTags,
+      booksList: defaultBooks
+    };
+
+    function saveToStorage() {
+      localStorage.setItem('BR_MASTER_DATABASE', JSON.stringify(MasterDatabase));
+      // 4. 所有編輯結果送出後，立刻整個網站重新渲染同步更新
+      globalSyncRender();
+    }
+
+    let currentRole = "reader";
+    let activeFilterTags = []; 
 
     // ==========================================
-    // 🧭 基礎水電：分頁切換系統
+    // 🗺️ 全動態核心渲染引擎 (全站同步的核心)
     // ==========================================
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const tabPanels = document.querySelectorAll('.tab-panel');
-
-    navButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        navButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-
-        const targetTabId = button.getAttribute('data-target');
-        tabPanels.forEach(panel => panel.classList.remove('active'));
-        document.getElementById(targetTabId).classList.add('active');
-        
-        // 切換分頁時順便更新資料畫面
-        renderPublicBookTable(booksDataset);
-        refreshAdminPanelLists();
-      });
-    });
-
-    // 小標籤點擊高亮效果（前台）
-    document.querySelectorAll('.tag-item').forEach(tag => {
-      tag.addEventListener('click', () => {
-        tag.classList.toggle('selected');
-      });
-    });
-
-    // ==========================================
-    // 🔐 4. 金鑰驗證系統 (金鑰：2xuan99\l/)
-    // ==========================================
-    const authBtn = document.querySelector('.auth-btn');
-    const authInput = document.querySelector('.auth-input');
-    const authZone = document.querySelector('.admin-auth-zone');
-    const adminDashboard = document.querySelector('.admin-panel-dashboard');
-    
-    const adminSecCategory = document.getElementById('admin-sec-category');
-    const adminSecTagManage = document.getElementById('admin-sec-tag-manage');
-    const adminSecBookManage = document.getElementById('admin-sec-book-manage');
-
-    authBtn.addEventListener('click', () => {
-      // 4. 檢查管理員金鑰
-      if (authInput.value === '2xuan99\\l/') {
-        alert('解鎖成功！歡迎最高管理員。');
-        currentRole = "admin";
-        authZone.style.display = 'none';
-        adminDashboard.style.display = 'block';
-        
-        // 管理員解鎖所有進階面板
-        adminSecCategory.style.display = 'block';
-        adminSecTagManage.style.display = 'block';
-        adminSecBookManage.style.display = 'block';
-        
-        refreshAdminPanelLists();
-      } else {
-        alert('密鑰錯誤！驗證失敗。');
-        authInput.value = '';
-      }
-    });
-
-    // 7. 使用者簡易新增書庫入口點擊事件
-    document.getElementById('go-user-add-trigger').addEventListener('click', () => {
-      currentRole = "user";
-      authZone.style.display = 'none';
-      adminDashboard.style.display = 'block';
+    function globalSyncRender() {
+      // 1. 渲染前台【標籤挑選頁】（包含新增的大分類）
+      const tagsGridRoot = document.getElementById('public-tags-grid-root');
+      tagsGridRoot.innerHTML = '';
       
-      // 使用者模式：隱藏大分類、標籤管理、書籍管理，只能純新增書籍
-      adminSecCategory.style.display = 'none';
-      adminSecTagManage.style.display = 'none';
-      adminSecBookManage.style.display = 'none';
-      
+      Object.keys(MasterDatabase.tagsConfig).forEach(category => {
+        if(MasterDatabase.tagsConfig[category].length === 0) return; // 若沒標籤就不顯示該分類
+        
+        const box = document.createElement('div');
+        box.className = 'category-box';
+        
+        let tagsButtonsHTML = MasterDatabase.tagsConfig[category].map(tag => {
+          const isSelected = activeFilterTags.includes(tag) ? 'selected' : '';
+          return `<button class="tag-item ${isSelected}" data-tagname="${tag}">${tag}</button>`;
+        }).join('');
+
+        box.innerHTML = `
+          <div class="category-header">
+            <h2>${category}</h2>
+            <div class="needle-line"></div>
+          </div>
+          <div class="tags-list">${tagsButtonsHTML}</div>
+        `;
+        tagsGridRoot.appendChild(box);
+      });
+
+      // 重新綁定前台標籤點擊事件
+      document.querySelectorAll('.tag-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tagname = btn.getAttribute('data-tagname');
+          if(activeFilterTags.includes(tagname)) {
+            activeFilterTags = activeFilterTags.filter(t => t !== tagname);
+          } else {
+            activeFilterTags.push(tagname);
+          }
+          globalSyncRender(); // 局部刷新高亮狀態
+        });
+      });
+
+      // 2. 執行前台書單清單過濾（融合「標籤選取」與「打字搜尋」）
+      executeSearchFilter();
+
+      // 3. 刷新後台管理面板的所有多選清單
       refreshAdminPanelLists();
-    });
+    }
 
-    // 6. 點擊右下角退出按鈕回到首頁
-    document.getElementById('btn-admin-logout').addEventListener('click', () => {
-      authInput.value = '';
-      adminDashboard.style.display = 'none';
-      authZone.style.display = 'flex';
-      currentRole = "reader";
+    // 2. 核心搜尋與標籤生成篩選算法
+    function executeSearchFilter() {
+      const searchKeyword = document.getElementById('main-search-input-field').value.trim().toLowerCase();
       
-      // 自動切換回第一個「標籤挑選」分頁
-      document.querySelector('[data-target="tab-tags"]').click();
-    });
+      let filteredResult = MasterDatabase.booksList.filter(book => {
+        // A. 標籤篩選條件：如果前台有選標籤，這本書必須包含「所有」被選中的標籤
+        let matchTags = true;
+        if(activeFilterTags.length > 0) {
+          matchTags = activeFilterTags.every(t => book.tags.includes(t));
+        }
+        // B. 關鍵字搜尋條件：模糊比對書名或作者
+        let matchKeyword = true;
+        if(searchKeyword) {
+          matchKeyword = book.title.toLowerCase().includes(searchKeyword) || 
+                         book.author.toLowerCase().includes(searchKeyword);
+        }
+        return matchTags && matchKeyword;
+      });
 
-    // ==========================================
-    // 🔄 資料動態渲染與同步核心
-    // ==========================================
-    
-    // 渲染前台書單清單（大行距無邊框）
-    function renderPublicBookTable(dataArray) {
+      // 渲染到前台表格
       const tbody = document.getElementById('public-book-table-body');
       tbody.innerHTML = '';
-      dataArray.forEach(book => {
-        const tr = document.createElement('tr');
-        let tagsHTML = book.tags.map(t => `<span class="tag-badge">${t}</span>`).join('');
-        tr.innerHTML = `
-          <td class="book-title">${book.title}</td>
-          <td class="book-author">${book.author}</td>
-          <td>${tagsHTML}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // 重新整理並刷新後台管理介面的所有勾選清單與最新 5 筆看板
-    function refreshAdminPanelLists() {
-      // A. 刷新書籍新增區裡面的標籤核取清單
-      const popBookTags = document.getElementById('pop-book-tags-list');
-      popBookTags.innerHTML = tagsDataset.map(t => `<label><input type="checkbox" value="${t}"> ${t}</label>`).join('');
-
-      // B. 刷新標籤管理區的清單
-      const popManageTags = document.getElementById('pop-manage-tags-list');
-      popManageTags.innerHTML = tagsDataset.map(t => `<label><input type="checkbox" name="manage-tags" value="${t}"> ${t}</label>`).join('');
-
-      // C. 刷新書籍管理區的清單
-      const popManageBooks = document.getElementById('pop-manage-books-list');
-      popManageBooks.innerHTML = booksDataset.map(b => `<label><input type="checkbox" name="manage-books" value="${b.id}"> ${b.title} (${b.author})</label>`).join('');
-
-      // D. 8. 渲染最新現存書籍動態看板（最多5筆顯示在最下方）
-      const recentUI = document.getElementById('recent-books-list-ui');
-      recentUI.innerHTML = '';
-      const sliceBooks = booksDataset.slice(-5).reverse(); // 取最後5筆並倒序排列
       
-      if(sliceBooks.length === 0) {
-        recentUI.innerHTML = '<li class="recent-item">目前資料庫空空如也...</li>';
-      } else {
-        sliceBooks.forEach(b => {
-          const li = document.createElement('li');
-          li.className = 'recent-item';
-          li.innerHTML = `<span><strong>${b.title}</strong> - ${b.author}</span> <span class="b-tags">${b.tags.join(', ')}</span>`;
-          recentUI.appendChild(li);
-        });
-      }
-    }
-
-    // ==========================================
-    // ⚙️ 後台核心資料庫操作功能（新增/刪除/合併）
-    // ==========================================
-
-    // 功能：新增書籍
-    document.getElementById('btn-add-book-data').addEventListener('click', () => {
-      const title = document.getElementById('new-book-title').value.trim();
-      const author = document.getElementById('new-book-author').value.trim();
-      
-      // 收集被勾選的標籤
-      const checkedBoxes = document.querySelectorAll('#pop-book-tags-list input:checked');
-      const selectedTags = Array.from(checkedBoxes).map(cb => cb.value);
-
-      if (!title || !author) {
-        alert('書名與作者都要填寫完整唷！');
-        return;
-      }
-
-      const newId = booksDataset.length > 0 ? Math.max(...booksDataset.map(b => b.id)) + 1 : 1;
-      booksDataset.push({ id: newId, title, author, tags: selectedTags });
-      
-      alert(`《${title}》已成功收錄到書庫中！`);
-      
-      // 清空欄位
-      document.getElementById('new-book-title').value = '';
-      document.getElementById('new-book-author').value = '';
-      refreshAdminPanelLists();
-    });
-
-    // 5. 功能：合併書籍
-    document.getElementById('btn-merge-books').addEventListener('click', () => {
-      const checkedBoxes = document.querySelectorAll('input[name="manage-books"]:checked');
-      if (checkedBoxes.length < 2) {
-        alert('請至少勾選兩本書籍來進行合併！');
-        return;
-      }
-
-      const newTitle = prompt('請輸入合併後的新書籍名稱：');
-      if (!newTitle) return;
-
-      const newAuthor = prompt('請輸入合併後的新作者名稱（留空則預設未知）：') || "未知作者";
-
-      // 提取所有要合併的書籍 ID
-      const targetIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
-
-      // 融合所有舊書的標籤（去除重複）
-      let mergedTags = [];
-      booksDataset.forEach(b => {
-        if (targetIds.includes(b.id)) {
-          mergedTags = mergedTags.concat(b.tags);
-        }
-      });
-      mergedTags = Array.from(new Set(mergedTags));
-
-      // 過濾掉舊書，保留沒被合併的書
-      booksDataset = booksDataset.filter(b => !targetIds.includes(b.id));
-
-      // 塞入全新融合完畢的書
-      const newId = booksDataset.length > 0 ? Math.max(...booksDataset.map(b => b.id)) + 1 : 1;
-      booksDataset.push({ id: newId, title: newTitle, author: newAuthor, tags: mergedTags });
-
-      alert('書籍融合大成功！');
-      refreshAdminPanelLists();
-    });
-
-    // 功能：刪除書籍
-    document.getElementById('btn-delete-books').addEventListener('click', () => {
-      const checkedBoxes = document.querySelectorAll('input[name="manage-books"]:checked');
-      if (checkedBoxes.length === 0) {
-        alert('請先勾選你要移除的書籍。');
-        return;
-      }
-      if (confirm('確定要將勾選的書籍從系統中永久抹除嗎？')) {
-        const targetIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
-        booksDataset = booksDataset.filter(b => !targetIds.includes(b.id));
-        refreshAdminPanelLists();
-      }
-    });
-
-    // 功能：新增大分類與標籤（目前簡化同步記憶體庫）
-    document.getElementById('btn-add-tag-data').addEventListener('click', () => {
-      const cat = document.getElementById('new-cat-input').value.trim();
-      const tag = document.getElementById('new-tag-input').value.trim();
-
-      if (tag && !tagsDataset.includes(tag)) {
-        tagsDataset.push(tag);
-        alert(`小標籤「${tag}」已加入配置資料夾！`);
-      } else if (cat) {
-        alert(`大分類「${cat}」已建立，請繼續為它追加小標籤。`);
-      }
-      document.getElementById('new-cat-input').value = '';
-      document.getElementById('new-tag-input').value = '';
-      refreshAdminPanelLists();
-    });
-
-    // 功能：合併標籤
-    document.getElementById('btn-merge-tags').addEventListener('click', () => {
-      const checkedBoxes = document.querySelectorAll('input[name="manage-tags"]:checked');
-      if (checkedBoxes.length < 2) {
-        alert('請至少勾選兩個標籤來進行合併！');
-        return;
-      }
-
-      const newTagName = prompt('請輸入合併後的新標籤名稱：');
-      if (!newTagName) return;
-
-      const targetTags = Array.from(checkedBoxes).map(cb => cb.value);
-
-      // 1. 在全域標籤庫更新
-      tagsDataset = tagsDataset.filter(t => !targetTags.includes(t));
-      if(!tagsDataset.includes(newTagName)) tagsDataset.push(newTagName);
-
-      // 2. 自動幫貼有舊標籤的書籍換新標籤
-      booksDataset.forEach(book => {
-        let hasOldTag = book.tags.some(t => targetTags.includes(t));
-        if (hasOldTag) {
-          book.tags = book.tags.filter(t => !targetTags.includes(t));
-          book.tags.push(newTagName);
-          book.tags = Array.from(new Set(book.tags)); // 去重
-        }
-      });
-
-      alert('標籤資料合併成功！貼有舊標籤的書籍已自動遷入新標籤。');
-      refreshAdminPanelLists();
-    });
-
-    // 功能：刪除標籤
-    document.getElementById('btn-delete-tags').addEventListener('click', () => {
-      const checkedBoxes = document.querySelectorAll('input[name="manage-tags"]:checked');
-      if (checkedBoxes.length === 0) {
-        alert('請先勾選要刪除的標籤。');
-        return;
-      }
-      if (confirm('刪除標籤會同步將現存書籍上的該標籤撕除，確定執行？')) {
-        const targetTags = Array.from(checkedBoxes).map(cb => cb.value);
-        tagsDataset = tagsDataset.filter(t => !targetTags.includes(t));
-        
-        // 從每本書的標籤群裡剔除
-        booksDataset.forEach(book => {
-          book.tags = book.tags.filter(t => !targetTags.includes(t));
-        });
-        
-        refreshAdminPanelLists();
-      }
-    });
-
-    // 初始化載入
-    renderPublicBookTable(booksDataset);
-  </script>
-</body>
-</html>
+      if(filteredResult.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888; padding:40px;">找不到符合條件的藏書 📚
