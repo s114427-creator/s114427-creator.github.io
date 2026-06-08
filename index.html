@@ -647,4 +647,277 @@
       tbody.innerHTML = '';
       
       if(filteredResult.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888; padding:40px;">找不到符合條件的藏書 📚
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888; padding:40px;">找不到符合條件的藏書 📚</td></tr>`;
+      } else {
+        filteredResult.forEach(book => {
+          const tr = document.createElement('tr');
+          let tagsHTML = book.tags.map(t => `<span class="tag-badge">${t}</span>`).join('');
+          tr.innerHTML = `
+            <td class="book-title">${book.title}</td>
+            <td class="book-author">${book.author}</td>
+            <td>${tagsHTML}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    // 後台清單完全同步與最新 5 筆看板
+    function refreshAdminPanelLists() {
+      // 提取平鋪的所有小標籤
+      let allFlatTags = [];
+      Object.keys(MasterDatabase.tagsConfig).forEach(cat => {
+        allFlatTags = allFlatTags.concat(MasterDatabase.tagsConfig[cat]);
+      });
+      allFlatTags = Array.from(new Set(allFlatTags));
+
+      // A. 刷新書籍新增區標籤列
+      const popBookTags = document.getElementById('pop-book-tags-list');
+      popBookTags.innerHTML = allFlatTags.map(t => `<label><input type="checkbox" value="${t}"> <span>${t}</span></label>`).join('');
+
+      // B. 刷新標籤管理區清單
+      const popManageTags = document.getElementById('pop-manage-tags-list');
+      popManageTags.innerHTML = allFlatTags.map(t => `<label><input type="checkbox" name="manage-tags" value="${t}"> <span>${t}</span></label>`).join('');
+
+      // C. 刷新書籍管理區清單
+      const popManageBooks = document.getElementById('pop-manage-books-list');
+      popManageBooks.innerHTML = MasterDatabase.booksList.map(b => `<label><input type="checkbox" name="manage-books" value="${b.id}"> <span>${b.title} (${b.author})</span></label>`).join('');
+
+      // D. 8. 顯示五筆最新新增書籍名稱（在最下方）
+      const recentUI = document.getElementById('recent-books-list-ui');
+      recentUI.innerHTML = '';
+      const sliceBooks = MasterDatabase.booksList.slice(-5).reverse();
+      
+      if(sliceBooks.length === 0) {
+        recentUI.innerHTML = '<li class="recent-item">目前資料庫空空如也...</li>';
+      } else {
+        sliceBooks.forEach(b => {
+          const li = document.createElement('li');
+          li.className = 'recent-item';
+          li.innerHTML = `<span><strong>${b.title}</strong> - ${b.author}</span> <span class="b-tags">${b.tags.join(', ')}</span>`;
+          recentUI.appendChild(li);
+        });
+      }
+    }
+
+    // ==========================================
+    // ⚙️ 互動事件監聽水電網
+    // ==========================================
+    
+    // 2. 標籤頁「生成書單」按鈕：點擊後自動抓取選中的標籤切換至搜尋頁
+    document.getElementById('btn-trigger-generate').addEventListener('click', () => {
+      // 直接模擬點擊頂部「搜尋書目」按鈕切換過去
+      document.getElementById('nav-btn-search').click();
+    });
+
+    // 2. 搜尋框打字即時動態搜尋
+    document.getElementById('main-search-input-field').addEventListener('input', () => {
+      executeSearchFilter();
+    });
+
+    // 4. 新增大分類與小標籤邏輯（嚴格防錯與完全同步）
+    document.getElementById('btn-add-tag-data').addEventListener('click', () => {
+      const cat = document.getElementById('new-cat-input').value.trim();
+      const tag = document.getElementById('new-tag-input').value.trim();
+
+      // 4. 必須輸入大分類加一個小標籤
+      if (!cat || !tag) {
+        alert('請注意：大分類名稱和小標籤名稱「皆為必填」，不可留空！');
+        return;
+      }
+
+      // 4. 檢查若大分類及小標籤完全相同則不執行操作
+      if (MasterDatabase.tagsConfig[cat] && MasterDatabase.tagsConfig[cat].includes(tag)) {
+        alert('此大分類下已經存在完全相同的標籤配置囉！');
+        return;
+      }
+
+      // 寫入核心庫
+      if (!MasterDatabase.tagsConfig[cat]) {
+        MasterDatabase.tagsConfig[cat] = [];
+      }
+      MasterDatabase.tagsConfig[cat].push(tag);
+      
+      alert(`配置成功！已將大分類【${cat}】追加標籤【${tag}】。`);
+      document.getElementById('new-cat-input').value = '';
+      document.getElementById('new-tag-input').value = '';
+      saveToStorage(); // 存檔並全網即時更新
+    });
+
+    // 5. 新增書籍功能（嚴格防錯）
+    document.getElementById('btn-add-book-data').addEventListener('click', () => {
+      const title = document.getElementById('new-book-title').value.trim();
+      const author = document.getElementById('new-book-author').value.trim();
+      
+      const checkedBoxes = document.querySelectorAll('#pop-book-tags-list input:checked');
+      const selectedTags = Array.from(checkedBoxes).map(cb => cb.value);
+
+      if (!title || !author) {
+        alert('書名與作者不可空白！');
+        return;
+      }
+
+      // 5. 若書名、作者皆一致則不執行
+      const isDuplicate = MasterDatabase.booksList.some(b => b.title.toLowerCase() === title.toLowerCase() && b.author.toLowerCase() === author.toLowerCase());
+      if (isDuplicate) {
+        alert(`警告：書庫中已存在《${title}》(${author})，請勿重複登錄！`);
+        return;
+      }
+
+      const newId = MasterDatabase.booksList.length > 0 ? Math.max(...MasterDatabase.booksList.map(b => b.id)) + 1 : 1;
+      MasterDatabase.booksList.push({ id: newId, title, author, tags: selectedTags });
+      
+      alert(`《${title}》已成功收入永久書庫！`);
+      document.getElementById('new-book-title').value = '';
+      document.getElementById('new-book-author').value = '';
+      saveToStorage();
+    });
+
+    // 合併書籍功能
+    document.getElementById('btn-merge-books').addEventListener('click', () => {
+      const checkedBoxes = document.querySelectorAll('input[name="manage-books"]:checked');
+      if (checkedBoxes.length < 2) {
+        alert('請至少勾選兩本書籍來進行合併！');
+        return;
+      }
+      const newTitle = prompt('請輸入合併後的新書籍名稱：');
+      if (!newTitle) return;
+      const newAuthor = prompt('請輸入合併後的新作者名稱：') || "未知作者";
+
+      const targetIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+      let mergedTags = [];
+      MasterDatabase.booksList.forEach(b => {
+        if (targetIds.includes(b.id)) mergedTags = mergedTags.concat(b.tags);
+      });
+      mergedTags = Array.from(new Set(mergedTags));
+
+      MasterDatabase.booksList = MasterDatabase.booksList.filter(b => !targetIds.includes(b.id));
+      const newId = MasterDatabase.booksList.length > 0 ? Math.max(...MasterDatabase.booksList.map(b => b.id)) + 1 : 1;
+      MasterDatabase.booksList.push({ id: newId, title: newTitle, author: newAuthor, tags: mergedTags });
+
+      alert('書籍合併成功！');
+      saveToStorage();
+    });
+
+    // 刪除書籍功能
+    document.getElementById('btn-delete-books').addEventListener('click', () => {
+      const checkedBoxes = document.querySelectorAll('input[name="manage-books"]:checked');
+      if (checkedBoxes.length === 0) return alert('請先勾選你要移除的書籍。');
+      if (confirm('確定要永久抹除勾選的書籍嗎？')) {
+        const targetIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+        MasterDatabase.booksList = MasterDatabase.booksList.filter(b => !targetIds.includes(b.id));
+        saveToStorage();
+      }
+    });
+
+    // 合併標籤功能
+    document.getElementById('btn-merge-tags').addEventListener('click', () => {
+      const checkedBoxes = document.querySelectorAll('input[name="manage-tags"]:checked');
+      if (checkedBoxes.length < 2) return alert('請至少勾選兩個標籤來進行合併！');
+      const newTagName = prompt('請輸入合併後的新標籤名稱：');
+      if (!newTagName) return;
+
+      const targetTags = Array.from(checkedBoxes).map(cb => cb.value);
+
+      // 替換大配置庫中的標籤
+      Object.keys(MasterDatabase.tagsConfig).forEach(cat => {
+        let list = MasterDatabase.tagsConfig[cat];
+        let hasAny = list.some(t => targetTags.includes(t));
+        if (hasAny) {
+          list = list.filter(t => !targetTags.includes(t));
+          if (!list.includes(newTagName)) list.push(newTagName);
+          MasterDatabase.tagsConfig[cat] = list;
+        }
+      });
+
+      // 同步換貼書籍標籤
+      MasterDatabase.booksList.forEach(book => {
+        if (book.tags.some(t => targetTags.includes(t))) {
+          book.tags = book.tags.filter(t => !targetTags.includes(t));
+          book.tags.push(newTagName);
+          book.tags = Array.from(new Set(book.tags));
+        }
+      });
+
+      alert('標籤資料合併更新完成！');
+      saveToStorage();
+    });
+
+    // 刪除標籤功能
+    document.getElementById('btn-delete-tags').addEventListener('click', () => {
+      const checkedBoxes = document.querySelectorAll('input[name="manage-tags"]:checked');
+      if (checkedBoxes.length === 0) return alert('請勾選要刪除的標籤。');
+      if (confirm('刪除標籤會同步將現存書籍上的該標籤撕除，確定執行？')) {
+        const targetTags = Array.from(checkedBoxes).map(cb => cb.value);
+        Object.keys(MasterDatabase.tagsConfig).forEach(cat => {
+          MasterDatabase.tagsConfig[cat] = MasterDatabase.tagsConfig[cat].filter(t => !targetTags.includes(t));
+        });
+        MasterDatabase.booksList.forEach(book => {
+          book.tags = book.tags.filter(t => !targetTags.includes(t));
+        });
+        saveToStorage();
+      }
+    });
+
+    // ==========================================
+    // 🚪 導覽切換、權限、退出與基礎開關
+    // ==========================================
+    const navButtonsAll = document.querySelectorAll('.nav-btn');
+    const tabPanelsAll = document.querySelectorAll('.tab-panel');
+    const authBtn = document.querySelector('.auth-btn');
+    const authInput = document.querySelector('.auth-input');
+    const authZone = document.querySelector('.admin-auth-zone');
+    const adminDashboard = document.querySelector('.admin-panel-dashboard');
+    const adminSecCategory = document.getElementById('admin-sec-category');
+    const adminSecTagManage = document.getElementById('admin-sec-tag-manage');
+    const adminSecBookManage = document.getElementById('admin-sec-book-manage');
+
+    navButtonsAll.forEach(button => {
+      button.addEventListener('click', () => {
+        navButtonsAll.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        const targetTabId = button.getAttribute('data-target');
+        tabPanelsAll.forEach(panel => panel.classList.remove('active'));
+        document.getElementById(targetTabId).classList.add('active');
+      });
+    });
+
+    authBtn.addEventListener('click', () => {
+      if (authInput.value === '2xuan99\\l/') {
+        alert('解鎖成功！歡迎最高管理員。');
+        currentRole = "admin";
+        authZone.style.display = 'none';
+        adminDashboard.style.display = 'block';
+        adminSecCategory.style.display = 'block';
+        adminSecTagManage.style.display = 'block';
+        adminSecBookManage.style.display = 'block';
+        globalSyncRender();
+      } else {
+        alert('密鑰錯誤！驗證失敗。');
+        authInput.value = '';
+      }
+    });
+
+    document.getElementById('go-user-add-trigger').addEventListener('click', () => {
+      currentRole = "user";
+      authZone.style.display = 'none';
+      adminDashboard.style.display = 'block';
+      adminSecCategory.style.display = 'none';
+      adminSecTagManage.style.display = 'none';
+      adminSecBookManage.style.display = 'none';
+      globalSyncRender();
+    });
+
+    document.getElementById('btn-admin-logout').addEventListener('click', () => {
+      authInput.value = '';
+      adminDashboard.style.display = 'none';
+      authZone.style.display = 'flex';
+      currentRole = "reader";
+      document.getElementById('nav-btn-tags').click(); // 6. 點擊後回到首頁
+    });
+
+    // 網頁初始化啟動
+    globalSyncRender();
+  </script>
+</body>
+</html>
