@@ -24,9 +24,9 @@
       flex-direction: column;
     }
 
-    /* 6. 網頁上 1/3 塊用色碼 #000079 且透明度 90% */
+    /* 網頁上 1/3 塊用色碼 #000079 且透明度 90% */
     .top-blue-zone {
-      background-color: rgba(0, 0, 121, 0.9); /* #000079 的 RGBA 90% 寫法 */
+      background-color: rgba(0, 0, 121, 0.9); 
       padding: 60px 20px 40px 20px;
       text-align: center;
       color: #ffffff;
@@ -80,6 +80,16 @@
 
     .tab-panel.active {
       display: block;
+    }
+
+    /* ⏳ 讀取中遮罩提示 */
+    .loading-overlay {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      font-size: 18px;
+      color: #000079;
+      font-weight: 600;
     }
 
     /* ==========================================
@@ -342,18 +352,18 @@
       margin-bottom: 10px;
     }
 
-    /* 3. 完美修復：文字與勾選框水平垂直對齊 */
+    /* 文字與核取方塊完美對齊 */
     .admin-checkbox-list label {
       display: flex;
-      align-items: center; /* 垂直居中對齊 */
-      gap: 8px; /* 框與文字之間的精緻間距 */
+      align-items: center; 
+      gap: 8px; 
       margin-bottom: 10px;
       font-size: 14px;
       cursor: pointer;
     }
 
     .admin-checkbox-list label input[type="checkbox"] {
-      margin: 0; /* 消除瀏覽器預設位移 */
+      margin: 0; 
       width: 16px;
       height: 16px;
       cursor: pointer;
@@ -446,11 +456,13 @@
 
   <div class="main-content-zone">
     <div class="global-wrapper">
-      <main class="content-container">
+      
+      <div id="global-loading-hint" class="loading-overlay">🌐 正在與雲端 Google 試算表同步資料中，請稍候...</div>
+
+      <main class="content-container" id="main-content-root-box">
 
         <section id="tab-tags" class="tab-panel active">
           <div class="tags-grid" id="public-tags-grid-root"></div>
-
           <div class="btn-offset-wrapper">
             <button class="btn-generate" id="btn-trigger-generate">生成書單</button>
           </div>
@@ -511,23 +523,11 @@
               </div>
 
               <div class="admin-section" id="admin-sec-tag-manage">
-                <h3>標籤管理（合併與刪除）</h3>
-                <p class="admin-tip">請勾選要操作的標籤：</p>
-                <div class="admin-checkbox-list" id="pop-manage-tags-list"></div>
-                <div class="admin-actions-group">
-                  <button class="danger-btn" id="btn-merge-tags">合併選取標籤</button>
-                  <button class="danger-btn" id="btn-delete-tags">刪除選取標籤</button>
-                </div>
-              </div>
-
-              <div class="admin-section" id="admin-sec-book-manage">
-                <h3>書籍管理（合併與刪除）</h3>
-                <p class="admin-tip">請勾選要操作的書籍：</p>
-                <div class="admin-checkbox-list" id="pop-manage-books-list"></div>
-                <div class="admin-actions-group">
-                  <button class="danger-btn" id="btn-merge-books">合併選取書籍</button>
-                  <button class="danger-btn" id="btn-delete-books">刪除選取書籍</button>
-                </div>
+                <h3>標籤狀態總覽</h3>
+                <p class="admin-tip" style="font-size:13px; line-height:1.6; color:#666;">
+                  💡 已接通 Google 雲端資料庫。<br>如需執行進階的「標籤與書籍合併、刪除」，請直接開啟您的 Google 試算表直接整行剪切或修改，全網設備將會一秒即時同步更新！
+                </p>
+                <div class="admin-checkbox-list" id="pop-manage-tags-list" style="margin-top:10px;"></div>
               </div>
             </div>
 
@@ -547,61 +547,115 @@
   </div>
 
   <script>
-    // ==========================================
-    // 💾 永續型記憶核心（持久化存儲讀取）
-    // ==========================================
-    const defaultTags = {
-      "世界觀": ["無限流", "校園文", "修仙"],
-      "甜度冰塊": ["全糖無刀", "有刀"]
-    };
-    const defaultBooks = [
-      { id: 1, title: "全球高考", author: "木蘇里", tags: ["無限流"] },
-      { id: 2, title: "天官賜福", author: "墨香銅臭", tags: ["有刀"] }
-    ];
+    // 🔗 貼上你專屬的 Google Apps Script 雲端串接網址
+    const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbyXMAEttyisY6qAK2hPXxj0Fhw8kgWFfA3pqgRN84WaAiJucJj6QW9GeeGAssaA9ni1/exec";
 
-    // 從 localStorage 讀取先前儲存的資料，若沒有則載入預設
-    let MasterDatabase = JSON.parse(localStorage.getItem('BR_MASTER_DATABASE')) || {
-      tagsConfig: defaultTags,
-      booksList: defaultBooks
+    // 本地記憶體鏡像資料庫
+    let MasterDatabase = {
+      tagsConfig: {},
+      booksList: []
     };
-
-    function saveToStorage() {
-      localStorage.setItem('BR_MASTER_DATABASE', JSON.stringify(MasterDatabase));
-      // 4. 所有編輯結果送出後，立刻整個網站重新渲染同步更新
-      globalSyncRender();
-    }
 
     let currentRole = "reader";
     let activeFilterTags = []; 
 
     // ==========================================
-    // 🗺️ 全動態核心渲染引擎 (全站同步的核心)
+    // 🌐 雲端連線：從 Google 試算表撈取資料 (GET)
+    // ==========================================
+    async function fetchDatabaseFromCloud() {
+      showLoading(true);
+      try {
+        const response = await fetch(CLOUD_API_URL);
+        const cloudData = await response.json();
+        
+        // 同步至本地鏡像
+        MasterDatabase.booksList = cloudData.booksList || [];
+        MasterDatabase.tagsConfig = cloudData.tagsConfig || {};
+        
+        // 成功取得資料後更新畫面
+        globalSyncRender();
+      } catch (error) {
+        console.error("雲端讀取失敗:", error);
+        alert("資料庫連線超時，請檢查 Google 試算表權限或 Apps Script 部署設定！");
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // ==========================================
+    // 💾 雲端連線：將資料寫入 Google 試算表 (POST)
+    // ==========================================
+    async function writeDataToCloud(payload) {
+      showLoading(true);
+      try {
+        // 利用 fetch 的 no-cors 或標準傳輸將 JSON 射向 Google
+        await fetch(CLOUD_API_URL, {
+          method: "POST",
+          mode: "no-cors", 
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        // 寫入後，強制重新去雲端拉取最新資料，確保整個網站所有設備同步更新
+        setTimeout(async () => {
+          await fetchDatabaseFromCloud();
+        }, 1200); // 延遲一秒等待 Google 表格寫入就緒
+      } catch (error) {
+        console.error("雲端寫入失敗:", error);
+        alert("資料上傳失敗！");
+        showLoading(false);
+      }
+    }
+
+    function showLoading(isLoading) {
+      const hint = document.getElementById('global-loading-hint');
+      const root = document.getElementById('main-content-root-box');
+      if(isLoading) {
+        hint.style.display = 'block';
+        root.style.opacity = '0.3';
+        root.style.pointerEvents = 'none';
+      } else {
+        hint.style.display = 'none';
+        root.style.opacity = '1';
+        root.style.pointerEvents = 'auto';
+      }
+    }
+
+    // ==========================================
+    // 🗺️ 全動態同步渲染引擎
     // ==========================================
     function globalSyncRender() {
-      // 1. 渲染前台【標籤挑選頁】（包含新增的大分類）
+      // 1. 渲染前台標籤頁
       const tagsGridRoot = document.getElementById('public-tags-grid-root');
       tagsGridRoot.innerHTML = '';
       
-      Object.keys(MasterDatabase.tagsConfig).forEach(category => {
-        if(MasterDatabase.tagsConfig[category].length === 0) return; // 若沒標籤就不顯示該分類
-        
-        const box = document.createElement('div');
-        box.className = 'category-box';
-        
-        let tagsButtonsHTML = MasterDatabase.tagsConfig[category].map(tag => {
-          const isSelected = activeFilterTags.includes(tag) ? 'selected' : '';
-          return `<button class="tag-item ${isSelected}" data-tagname="${tag}">${tag}</button>`;
-        }).join('');
+      const categories = Object.keys(MasterDatabase.tagsConfig);
+      if(categories.length === 0) {
+        tagsGridRoot.innerHTML = `<p style="color:#888; text-align:center; width:100%;">雲端資料庫內目前沒有標籤，請去後台新增配置！</p>`;
+      } else {
+        categories.forEach(category => {
+          if(MasterDatabase.tagsConfig[category].length === 0) return;
+          
+          const box = document.createElement('div');
+          box.className = 'category-box';
+          
+          let tagsButtonsHTML = MasterDatabase.tagsConfig[category].map(tag => {
+            const isSelected = activeFilterTags.includes(tag) ? 'selected' : '';
+            return `<button class="tag-item ${isSelected}" data-tagname="${tag}">${tag}</button>`;
+          }).join('');
 
-        box.innerHTML = `
-          <div class="category-header">
-            <h2>${category}</h2>
-            <div class="needle-line"></div>
-          </div>
-          <div class="tags-list">${tagsButtonsHTML}</div>
-        `;
-        tagsGridRoot.appendChild(box);
-      });
+          box.innerHTML = `
+            <div class="category-header">
+              <h2>${category}</h2>
+              <div class="needle-line"></div>
+            </div>
+            <div class="tags-list">${tagsButtonsHTML}</div>
+          `;
+          tagsGridRoot.appendChild(box);
+        });
+      }
 
       // 重新綁定前台標籤點擊事件
       document.querySelectorAll('.tag-item').forEach(btn => {
@@ -612,28 +666,25 @@
           } else {
             activeFilterTags.push(tagname);
           }
-          globalSyncRender(); // 局部刷新高亮狀態
+          globalSyncRender(); 
         });
       });
 
-      // 2. 執行前台書單清單過濾（融合「標籤選取」與「打字搜尋」）
+      // 2. 執行前台書單篩選與關鍵字過濾
       executeSearchFilter();
 
-      // 3. 刷新後台管理面板的所有多選清單
+      // 3. 刷新後台管理面板清單
       refreshAdminPanelLists();
     }
 
-    // 2. 核心搜尋與標籤生成篩選算法
     function executeSearchFilter() {
       const searchKeyword = document.getElementById('main-search-input-field').value.trim().toLowerCase();
       
       let filteredResult = MasterDatabase.booksList.filter(book => {
-        // A. 標籤篩選條件：如果前台有選標籤，這本書必須包含「所有」被選中的標籤
         let matchTags = true;
         if(activeFilterTags.length > 0) {
           matchTags = activeFilterTags.every(t => book.tags.includes(t));
         }
-        // B. 關鍵字搜尋條件：模糊比對書名或作者
         let matchKeyword = true;
         if(searchKeyword) {
           matchKeyword = book.title.toLowerCase().includes(searchKeyword) || 
@@ -642,7 +693,6 @@
         return matchTags && matchKeyword;
       });
 
-      // 渲染到前台表格
       const tbody = document.getElementById('public-book-table-body');
       tbody.innerHTML = '';
       
@@ -662,28 +712,22 @@
       }
     }
 
-    // 後台清單完全同步與最新 5 筆看板
     function refreshAdminPanelLists() {
-      // 提取平鋪的所有小標籤
       let allFlatTags = [];
       Object.keys(MasterDatabase.tagsConfig).forEach(cat => {
         allFlatTags = allFlatTags.concat(MasterDatabase.tagsConfig[cat]);
       });
       allFlatTags = Array.from(new Set(allFlatTags));
 
-      // A. 刷新書籍新增區標籤列
+      // 刷新書籍新增區標籤列
       const popBookTags = document.getElementById('pop-book-tags-list');
       popBookTags.innerHTML = allFlatTags.map(t => `<label><input type="checkbox" value="${t}"> <span>${t}</span></label>`).join('');
 
-      // B. 刷新標籤管理區清單
+      // 顯示現存總標籤快覽
       const popManageTags = document.getElementById('pop-manage-tags-list');
-      popManageTags.innerHTML = allFlatTags.map(t => `<label><input type="checkbox" name="manage-tags" value="${t}"> <span>${t}</span></label>`).join('');
+      popManageTags.innerHTML = allFlatTags.map(t => `<div style="font-size:14px; color:#333; padding:4px 0;">🏷️ ${t}</div>`).join('');
 
-      // C. 刷新書籍管理區清單
-      const popManageBooks = document.getElementById('pop-manage-books-list');
-      popManageBooks.innerHTML = MasterDatabase.booksList.map(b => `<label><input type="checkbox" name="manage-books" value="${b.id}"> <span>${b.title} (${b.author})</span></label>`).join('');
-
-      // D. 8. 顯示五筆最新新增書籍名稱（在最下方）
+      // 顯示五筆最新新增書籍名稱（在最下方）
       const recentUI = document.getElementById('recent-books-list-ui');
       recentUI.innerHTML = '';
       const sliceBooks = MasterDatabase.booksList.slice(-5).reverse();
@@ -701,51 +745,47 @@
     }
 
     // ==========================================
-    // ⚙️ 互動事件監聽水電網
+    // ⚙️ 互動事件監聽核心
     // ==========================================
     
-    // 2. 標籤頁「生成書單」按鈕：點擊後自動抓取選中的標籤切換至搜尋頁
     document.getElementById('btn-trigger-generate').addEventListener('click', () => {
-      // 直接模擬點擊頂部「搜尋書目」按鈕切換過去
       document.getElementById('nav-btn-search').click();
     });
 
-    // 2. 搜尋框打字即時動態搜尋
     document.getElementById('main-search-input-field').addEventListener('input', () => {
       executeSearchFilter();
     });
 
-    // 4. 新增大分類與小標籤邏輯（嚴格防錯與完全同步）
-    document.getElementById('btn-add-tag-data').addEventListener('click', () => {
+    // 功能 A：新增大分類與標籤（上傳至雲端）
+    document.getElementById('btn-add-tag-data').addEventListener('click', async () => {
       const cat = document.getElementById('new-cat-input').value.trim();
       const tag = document.getElementById('new-tag-input').value.trim();
 
-      // 4. 必須輸入大分類加一個小標籤
       if (!cat || !tag) {
         alert('請注意：大分類名稱和小標籤名稱「皆為必填」，不可留空！');
         return;
       }
 
-      // 4. 檢查若大分類及小標籤完全相同則不執行操作
       if (MasterDatabase.tagsConfig[cat] && MasterDatabase.tagsConfig[cat].includes(tag)) {
         alert('此大分類下已經存在完全相同的標籤配置囉！');
         return;
       }
 
-      // 寫入核心庫
-      if (!MasterDatabase.tagsConfig[cat]) {
-        MasterDatabase.tagsConfig[cat] = [];
-      }
-      MasterDatabase.tagsConfig[cat].push(tag);
-      
-      alert(`配置成功！已將大分類【${cat}】追加標籤【${tag}】。`);
+      const payload = {
+        action: "addTag",
+        category: cat,
+        tagName: tag
+      };
+
       document.getElementById('new-cat-input').value = '';
       document.getElementById('new-tag-input').value = '';
-      saveToStorage(); // 存檔並全網即時更新
+      
+      alert(`發送配置中！即將在雲端建立大分類【${cat}】與標籤【${tag}】。`);
+      await writeDataToCloud(payload);
     });
 
-    // 5. 新增書籍功能（嚴格防錯）
-    document.getElementById('btn-add-book-data').addEventListener('click', () => {
+    // 功能 B：新增書籍功能（上傳至雲端與嚴格防錯）
+    document.getElementById('btn-add-book-data').addEventListener('click', async () => {
       const title = document.getElementById('new-book-title').value.trim();
       const author = document.getElementById('new-book-author').value.trim();
       
@@ -757,110 +797,29 @@
         return;
       }
 
-      // 5. 若書名、作者皆一致則不執行
+      // 若書名、作者皆一致則不執行
       const isDuplicate = MasterDatabase.booksList.some(b => b.title.toLowerCase() === title.toLowerCase() && b.author.toLowerCase() === author.toLowerCase());
       if (isDuplicate) {
         alert(`警告：書庫中已存在《${title}》(${author})，請勿重複登錄！`);
         return;
       }
 
-      const newId = MasterDatabase.booksList.length > 0 ? Math.max(...MasterDatabase.booksList.map(b => b.id)) + 1 : 1;
-      MasterDatabase.booksList.push({ id: newId, title, author, tags: selectedTags });
-      
-      alert(`《${title}》已成功收入永久書庫！`);
+      const payload = {
+        action: "addBook",
+        title: title,
+        author: author,
+        tags: selectedTags
+      };
+
       document.getElementById('new-book-title').value = '';
       document.getElementById('new-book-author').value = '';
-      saveToStorage();
-    });
-
-    // 合併書籍功能
-    document.getElementById('btn-merge-books').addEventListener('click', () => {
-      const checkedBoxes = document.querySelectorAll('input[name="manage-books"]:checked');
-      if (checkedBoxes.length < 2) {
-        alert('請至少勾選兩本書籍來進行合併！');
-        return;
-      }
-      const newTitle = prompt('請輸入合併後的新書籍名稱：');
-      if (!newTitle) return;
-      const newAuthor = prompt('請輸入合併後的新作者名稱：') || "未知作者";
-
-      const targetIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
-      let mergedTags = [];
-      MasterDatabase.booksList.forEach(b => {
-        if (targetIds.includes(b.id)) mergedTags = mergedTags.concat(b.tags);
-      });
-      mergedTags = Array.from(new Set(mergedTags));
-
-      MasterDatabase.booksList = MasterDatabase.booksList.filter(b => !targetIds.includes(b.id));
-      const newId = MasterDatabase.booksList.length > 0 ? Math.max(...MasterDatabase.booksList.map(b => b.id)) + 1 : 1;
-      MasterDatabase.booksList.push({ id: newId, title: newTitle, author: newAuthor, tags: mergedTags });
-
-      alert('書籍合併成功！');
-      saveToStorage();
-    });
-
-    // 刪除書籍功能
-    document.getElementById('btn-delete-books').addEventListener('click', () => {
-      const checkedBoxes = document.querySelectorAll('input[name="manage-books"]:checked');
-      if (checkedBoxes.length === 0) return alert('請先勾選你要移除的書籍。');
-      if (confirm('確定要永久抹除勾選的書籍嗎？')) {
-        const targetIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
-        MasterDatabase.booksList = MasterDatabase.booksList.filter(b => !targetIds.includes(b.id));
-        saveToStorage();
-      }
-    });
-
-    // 合併標籤功能
-    document.getElementById('btn-merge-tags').addEventListener('click', () => {
-      const checkedBoxes = document.querySelectorAll('input[name="manage-tags"]:checked');
-      if (checkedBoxes.length < 2) return alert('請至少勾選兩個標籤來進行合併！');
-      const newTagName = prompt('請輸入合併後的新標籤名稱：');
-      if (!newTagName) return;
-
-      const targetTags = Array.from(checkedBoxes).map(cb => cb.value);
-
-      // 替換大配置庫中的標籤
-      Object.keys(MasterDatabase.tagsConfig).forEach(cat => {
-        let list = MasterDatabase.tagsConfig[cat];
-        let hasAny = list.some(t => targetTags.includes(t));
-        if (hasAny) {
-          list = list.filter(t => !targetTags.includes(t));
-          if (!list.includes(newTagName)) list.push(newTagName);
-          MasterDatabase.tagsConfig[cat] = list;
-        }
-      });
-
-      // 同步換貼書籍標籤
-      MasterDatabase.booksList.forEach(book => {
-        if (book.tags.some(t => targetTags.includes(t))) {
-          book.tags = book.tags.filter(t => !targetTags.includes(t));
-          book.tags.push(newTagName);
-          book.tags = Array.from(new Set(book.tags));
-        }
-      });
-
-      alert('標籤資料合併更新完成！');
-      saveToStorage();
-    });
-
-    // 刪除標籤功能
-    document.getElementById('btn-delete-tags').addEventListener('click', () => {
-      const checkedBoxes = document.querySelectorAll('input[name="manage-tags"]:checked');
-      if (checkedBoxes.length === 0) return alert('請勾選要刪除的標籤。');
-      if (confirm('刪除標籤會同步將現存書籍上的該標籤撕除，確定執行？')) {
-        const targetTags = Array.from(checkedBoxes).map(cb => cb.value);
-        Object.keys(MasterDatabase.tagsConfig).forEach(cat => {
-          MasterDatabase.tagsConfig[cat] = MasterDatabase.tagsConfig[cat].filter(t => !targetTags.includes(t));
-        });
-        MasterDatabase.booksList.forEach(book => {
-          book.tags = book.tags.filter(t => !targetTags.includes(t));
-        });
-        saveToStorage();
-      }
+      
+      alert(`上傳中！正在將《${title}》同步寫入雲端大書庫...`);
+      await writeDataToCloud(payload);
     });
 
     // ==========================================
-    // 🚪 導覽切換、權限、退出與基礎開關
+    // 🚪 導覽切換與管理員金鑰 (2xuan99\l/)
     // ==========================================
     const navButtonsAll = document.querySelectorAll('.nav-btn');
     const tabPanelsAll = document.querySelectorAll('.tab-panel');
@@ -869,8 +828,6 @@
     const authZone = document.querySelector('.admin-auth-zone');
     const adminDashboard = document.querySelector('.admin-panel-dashboard');
     const adminSecCategory = document.getElementById('admin-sec-category');
-    const adminSecTagManage = document.getElementById('admin-sec-tag-manage');
-    const adminSecBookManage = document.getElementById('admin-sec-book-manage');
 
     navButtonsAll.forEach(button => {
       button.addEventListener('click', () => {
@@ -883,14 +840,13 @@
     });
 
     authBtn.addEventListener('click', () => {
+      // 驗證管理員金鑰
       if (authInput.value === '2xuan99\\l/') {
         alert('解鎖成功！歡迎最高管理員。');
         currentRole = "admin";
         authZone.style.display = 'none';
         adminDashboard.style.display = 'block';
-        adminSecCategory.style.display = 'block';
-        adminSecTagManage.style.display = 'block';
-        adminSecBookManage.style.display = 'block';
+        adminSecCategory.style.display = 'block'; 
         globalSyncRender();
       } else {
         alert('密鑰錯誤！驗證失敗。');
@@ -902,9 +858,7 @@
       currentRole = "user";
       authZone.style.display = 'none';
       adminDashboard.style.display = 'block';
-      adminSecCategory.style.display = 'none';
-      adminSecTagManage.style.display = 'none';
-      adminSecBookManage.style.display = 'none';
+      adminSecCategory.style.display = 'none'; // 使用者隱藏標籤配置區
       globalSyncRender();
     });
 
@@ -913,11 +867,11 @@
       adminDashboard.style.display = 'none';
       authZone.style.display = 'flex';
       currentRole = "reader";
-      document.getElementById('nav-btn-tags').click(); // 6. 點擊後回到首頁
+      document.getElementById('nav-btn-tags').click(); // 退出回到首頁
     });
 
-    // 網頁初始化啟動
-    globalSyncRender();
+    // 🚀 網頁一啟動：立刻自動向 Google 試算表同步讀取全站資料
+    fetchDatabaseFromCloud();
   </script>
 </body>
 </html>
